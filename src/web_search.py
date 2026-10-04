@@ -1,6 +1,8 @@
 import os
 import requests
+from search import VisualSearch
 from image_downloader import download_matches
+from visualizer import display_top_results
 
 class WebImageSearch:
 
@@ -72,6 +74,7 @@ class WebImageSearch:
 if __name__ == "__main__":
 
     search = WebImageSearch()
+    visual_search = VisualSearch("examples/candidates")
 
     # SerpApi supports uploading a local JPG/PNG/WebP directly. The upload limit is 500 KB, 
     # and the resulting image_id lasts 10 minutes. Google Lens can then return structured visual_matches, 
@@ -92,7 +95,29 @@ if __name__ == "__main__":
         visual_matches= search.get_visual_matches(results)
         print("Visual matches returned:", len(visual_matches))
 
-        download_matches(visual_matches, query_index)
+        candidate_paths = download_matches( ## Get the candidate image paths downloaded from the web
+            visual_matches, 
+            query_index,
+            10
+        )
+
+        # Embed the images
+        query_embedding= visual_search.extractor.extract(image_path)
+        candidate_embeddings= visual_search.get_embeddings(candidate_paths)
+
+        similarities= visual_search.cosine_similarity( # Compute similarity of query -> candidates from web scrape
+            query_embedding,
+            candidate_embeddings
+        )
+
+        ranked_results = visual_search.rank_results(
+            candidate_paths,
+            similarities
+        )
+
+        display_top_results(ranked_results, top_k=6)
+
+
 
     # image_path = "examples/query/query.jpg"
     # upload_result= search.upload_image(image_path)

@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     extractor = FeatureExtractor()
 
-    image_path = "examples/query/query.jpg"
+    image_path = "examples/query/query0.jpg"
     embedding = extractor.extract(
         image_path
     )
