@@ -30,9 +30,12 @@ class VisualSearch:
 
         for image_path in image_paths:
             embedding = self.extractor.extract(image_path)
-            embeddings.append(embedding)
+            embeddings.append(np.asarray(embedding).reshape(-1))
 
-        return np.array(embeddings)
+        if not embeddings:
+            return np.empty((0,0))
+
+        return np.vstack(embeddings)
 
     def cosine_similarity(self, query_embedding, candidate_embeddings):
         query_norm = np.linalg.norm(query_embedding)

@@ -21,6 +21,9 @@ examples/candidates/*.jpg
 examples/candidates/*.jpeg
 examples/candidates/*.png
 
+# Runtime application state
+runtime/
+
 # OS files
 .DS_Store
 Thumbs.db
