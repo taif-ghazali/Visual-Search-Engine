@@ -3,10 +3,15 @@ from io import BytesIO
 from PIL import Image, UnidentifiedImageError
 
 def download_image(image_url, save_path):
-    response = requests.get(image_url)
+    response = requests.get(
+        image_url,
+        timeout=10,
+        headers={"User-Agent":"Mozilla/5.0"}
+    )
     response.raise_for_status()
 
     image= Image.open(BytesIO(response.content))
+    image.load()
 
     image = image.convert("RGB")
     image.save(save_path, format="JPEG", quality = 95)
@@ -38,7 +43,7 @@ def download_matches(matches, target_dir, target_count= 8):
             if (successful == target_count):
                 break
 
-        except (requests.exceptions.RequestException, ValueError, UnidentifiedImageError) as e:
+        except (requests.exceptions.RequestException, ValueError, OSError, UnidentifiedImageError) as e:
             print(f"Failed: candidate_{image_number:02d}.jpg")
             print(f"Reason: {e}")
             failed +=1

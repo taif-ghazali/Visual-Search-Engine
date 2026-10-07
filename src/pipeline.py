@@ -14,7 +14,12 @@ def run_visual_search(image_path, target_dir, top_k=4):
 
     # Search for visual matches
     results = search.search_by_image(image_id)
+    print("Search response keys:", results.keys())
     print(f"Visual matches returned: {len(results.get('visual_matches', []))}")
+    
+    if not results.get("visual_matches"):
+        print("FULL RESPONSE:", results)
+    
     visual_matches = search.get_visual_matches(results)
 
     # Download candidates

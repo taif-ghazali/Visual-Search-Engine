@@ -13,6 +13,7 @@ st.set_page_config(
 sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
 from pipeline import run_visual_search
 from ui import render_search_layout
+from web_search_ui import render_web_search
 
 def load_css():
     css_path = Path(__file__).parent / "style.css"
@@ -25,6 +26,15 @@ def load_css():
 
 load_css()
 st.title("Visual Search")
+if "web_search_mode" not in st.session_state:
+    st.session_state.web_search_mode= False
+
+if st.button("Search Web", use_container_width=True):
+    st.session_state.web_search_mode = True
+
+if st.session_state.web_search_mode:
+    render_web_search()
+    st.stop()
 
 # Create a temporary folder for this Streamlit session
 if "session_dir" not in st.session_state:
