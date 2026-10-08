@@ -28,6 +28,8 @@ class WebImageSearch:
             "engine": "google_lens",
             "image_id": image_id,
             "type": "visual_matches",
+            "auto_crop": "true",
+            "no_cache": "true",
             "api_key": self.api_key
         }
 
@@ -44,6 +46,12 @@ class WebImageSearch:
         clean_matches= []
 
         for match in matches:
+            if (
+                "tiktok.com" in match.get("link", "").lower()
+                or "tiktok.com" in match.get("image", "").lower()
+                or "tiktok" in match.get("source", "").lower()
+            ):
+                continue
             clean_matches.append({
                 "title": match.get("title"),
                 "link": match.get("link"), 

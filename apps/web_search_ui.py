@@ -9,23 +9,6 @@ from web_image_search import WebImageSearch
 def render_web_search():
 
     st.subheader("Search the Web")
-
-    # query = st.text_input(
-    #     "Search for an image",
-    #     placeholder="Ferrari 488, aircraft, horror movie...",
-    #     key="web_search_query"
-    # )
-
-    # search = WebImageSearch()
-
-    # if query:
-    #     if st.button("Search", use_container_width=True):
-
-    #         with st.spinner("Searching the web..."):
-    #             images = search.search(query, limit=6)
-
-    #         st.session_state.web_images = images
-    
     search= WebImageSearch()
 
     with st.form("web_search_form"):
@@ -63,4 +46,4 @@ def render_web_search():
 
                 if st.button("Select", key=f"select_web_image_{i}"):
                     st.session_state.selected_web_image = image
-                    st.success("Image selected!")
+                    st.rerun()

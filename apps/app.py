@@ -14,6 +14,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
 from pipeline import run_visual_search
 from ui import render_search_layout
 from web_search_ui import render_web_search
+from image_downloader import download_image
 
 def load_css():
     css_path = Path(__file__).parent / "style.css"
@@ -32,17 +33,49 @@ if "web_search_mode" not in st.session_state:
 if st.button("Search Web", use_container_width=True):
     st.session_state.web_search_mode = True
 
-if st.session_state.web_search_mode:
-    render_web_search()
-    st.stop()
-
 # Create a temporary folder for this Streamlit session
 if "session_dir" not in st.session_state:
+    sessions_dir = Path("runtime") / "sessions"
+    sessions_dir.mkdir(parents=True, exist_ok=True)
+
+    for old_session in sessions_dir.iterdir():
+        if old_session.is_dir():
+            shutil.rmtree(old_session, ignore_errors=True)
+
     session_id = str(uuid.uuid4())
-    session_dir = Path("runtime") / "sessions" / session_id
+    session_dir = sessions_dir / session_id
     session_dir.mkdir(parents=True, exist_ok=True)
 
     st.session_state.session_dir = session_dir
+
+if st.session_state.web_search_mode:
+    selected_web_image = st.session_state.get("selected_web_image")
+    if selected_web_image is None:
+        render_web_search()
+        st.stop()
+    # if "selected_web_image" not in st.session_state:
+    #     render_web_search()
+    # selected_web_image= st.session_state.get("selected_web_image")
+    # if selected_web_image:
+    query_path= st.session_state.session_dir/ "query.jpg"
+    candidates_dir= st.session_state.session_dir/ "candidates"
+
+    with st.spinner("Downloading selected image..."):
+        download_image(
+            selected_web_image["original"],
+            query_path
+        )
+
+    with st.spinner("Searching for visually similar images"):
+        results = run_visual_search(
+            query_path,
+            candidates_dir,
+            top_k =4
+        )
+    st.write("Search Complete.")
+    render_search_layout(query_path, results)
+    st.stop()
+
 
 uploaded_file = st.file_uploader(
     "Drop an image here or browse",
